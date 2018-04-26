@@ -1,6 +1,11 @@
 package no.nav.perftest;
 
+import com.sun.net.httpserver.HttpServer;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -9,6 +14,22 @@ import java.security.Signature;
 public class VerifySignatureTest {
     public static void main(String[] args) throws Exception {
         System.out.println("Got to main in: " + ManagementFactory.getRuntimeMXBean().getUptime() + " ms.");
+        new Thread(() -> {
+            try {
+                HttpServer httpServer = HttpServer.create(new InetSocketAddress(8000), 0);
+                httpServer.createContext("/is_alive", exchange -> {
+                    byte[] response = "I'm alive".getBytes("UTF-8");
+                    exchange.sendResponseHeaders(200, response.length);
+                    OutputStream outputStream = exchange.getResponseBody();
+                    outputStream.write(response);
+                    outputStream.close();
+                });
+                httpServer.setExecutor(null);
+                httpServer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
         long mainStart = System.currentTimeMillis();
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
