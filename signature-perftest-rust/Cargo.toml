@@ -1,0 +1,9 @@
+[package]
+name = "signature-perftest-rust"
+version = "0.1.0"
+authors = ["Kevin Sillerud <kevin.sillerud@gmail.com>"]
+
+[dependencies]
+rocket="0.3"
+rocket_codegen="0.3"
+openssl="0.10"
